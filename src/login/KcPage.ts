@@ -9,15 +9,45 @@ export const doUseDefaultCss = true;
 export const doMakeUserConfirmPassword = true;
 
 export async function getKcPage(pageId: KcContext['pageId']): Promise<KcPage> {
-  switch (pageId) {
-    default:
-      return {
-        PageComponent: await getDefaultPageComponent(pageId),
-        TemplateComponent,
-        UserProfileFormFieldsComponent,
-        doMakeUserConfirmPassword,
-        doUseDefaultCss,
-        classes,
-      };
-  }
+ const PageComponent = await (async () => {
+    switch (pageId) {
+      case 'login.ftl':
+        return (
+          await import('./pages/caju/login/login-personalizado.component')
+        ).LoginPersonalizadoComponent;
+
+      case 'login-reset-password.ftl':
+        return (
+          await import(
+            './pages/caju/reset-password/recuperacao-senha-personalizado.component'
+          )
+        ).RecuperacaoSenhaComponent;
+
+      case 'login-update-password.ftl':
+        return (
+          await import(
+            './pages/caju/update-password/alteracao-senha-personalizado.component'
+          )
+        ).AlteracaoSenhaComponent;
+
+       case 'email-otp-code.ftl':
+        return (
+          await import(
+            './pages/caju/email-otp-code/email-otp-code-personalizado.component'
+          )
+        ).EmailOtpCodeComponent;  
+
+      default:
+        return getDefaultPageComponent(pageId);
+    }
+  })();
+
+  return {
+    PageComponent,
+    TemplateComponent,
+    UserProfileFormFieldsComponent,
+    doMakeUserConfirmPassword,
+    doUseDefaultCss,
+    classes,
+  };
 }

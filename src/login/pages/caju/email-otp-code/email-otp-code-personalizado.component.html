@@ -1,0 +1,112 @@
+<app-layout-autenticacao>
+  <div class="formulario">
+
+      <h1>{{ i18n.msgStr('otpTitle') }}</h1>
+      <p class="apoio">{{ i18n.msgStr('otpInstruction') }}</p>
+
+      @if (kcContext.message) {
+        <div class="mensagem" role="status">
+          {{ kcContext.message.summary }}
+        </div>
+      }
+
+      <form
+        id="kc-email-otp-form"
+        class="formulario-login"
+        method="post"
+        [attr.action]="kcContext.url?.loginAction"
+        [attr.aria-busy]="envioIniciado()"
+        (submit)="aoEnviar($event)"
+      >
+        <input type="hidden" name="otp" [value]="otp().join('')" />
+
+        <fieldset class="grupo-codigo">
+          <legend>{{ i18n.msgStr('otpCodeLegend') }}</legend>
+
+          <div
+            class="campos-codigo"
+            role="group"
+            [attr.aria-label]="i18n.msgStr('otpCodeGroupLabel')"
+            [attr.aria-invalid]="erroLocal() || temErroOtp() ? 'true' : null"
+            aria-describedby="erro-otp"
+          >
+            @for (digito of otp(); track $index) {
+              <input
+                class="campo-codigo"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="1"
+                [attr.data-otp-index]="$index"
+                [value]="digito"
+                [attr.autocomplete]="$index === 0 ? 'one-time-code' : 'off'"
+                [attr.aria-label]="i18n.msgStr('otpDigit') + ' ' + ($index + 1) + ' ' + i18n.msgStr('otpOfSix')"
+                [attr.aria-invalid]="erroLocal() || temErroOtp() ? 'true' : null"
+                [autofocus]="$index === 0"
+                (input)="aoDigitar($index, $event)"
+                (paste)="aoColar($index, $event)"
+                (keydown)="aoPressionarTecla($index, $event)"
+              />
+            }
+          </div>
+        </fieldset>
+
+        @if (erroLocal()) {
+          <p id="erro-otp" class="erro" role="alert">
+            {{ i18n.msgStr('otpIncompleteError') }}
+          </p>
+        } @else if (temErroOtp()) {
+          <p id="erro-otp" class="erro" role="alert">
+            {{ mensagemErroOtp() }}
+          </p>
+        }
+
+        <label class="confiar-dispositivo">
+          <input
+            type="checkbox"
+            name="trustDevice"
+            value="true"
+            [checked]="confiarDispositivo()"
+            (change)="confiarDispositivo.set($any($event.target).checked)"
+          />
+          <span>{{ i18n.msgStr('otpTrustDevice') }}</span>
+        </label>
+
+        <button
+          class="botao-principal"
+          type="submit"
+          name="validateOtp"
+          value="true"
+        >
+          {{ envioIniciado() ? i18n.msgStr('otpSending') : i18n.msgStr('otpValidate') }}
+        </button>
+
+        <div class="acoes-secundarias">
+          <button
+            class="link-acao"
+            type="submit"
+            name="resendCode"
+            value="true"
+          >
+            {{ i18n.msgStr('otpResend') }}
+          </button>
+
+          <button
+            class="link-acao voltar"
+            type="submit"
+            name="execution"
+            value="restart"
+          >
+            <i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i>
+            <span>{{ i18n.msgStr('backToLogin') }}</span>
+          </button>
+        </div>
+      </form>
+
+      <p class="rodape">
+        <a href="mailto:caju.biblioteca@stj.jus.br">
+          caju.biblioteca@stj.jus.br
+        </a>
+      </p>
+  </div>
+</app-layout-autenticacao>

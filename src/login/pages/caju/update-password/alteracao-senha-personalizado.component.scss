@@ -1,0 +1,204 @@
+:host {
+  display: block;
+  width: 100%;
+  color: #18304b;
+  font-family: Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.formulario {
+  width: 100%;
+  max-width: 440px;
+  margin: auto;
+  padding: 28px 0;
+  font-size: calc(1rem * var(--escala, 1));
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 1.8em;
+  }
+}
+
+.apoio {
+  margin: 0 0 22px;
+  color: #66758a;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.formulario-login {
+  display: grid;
+  gap: 18px;
+}
+
+.campo {
+  label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 44px 10px 12px;
+    border: 1px solid #aab4c1;
+    border-radius: 8px;
+    background: #fff;
+    color: #18304b;
+    font-family: inherit;
+    font-size: 1rem;
+
+    &:focus-visible {
+      outline: 3px solid #266bb1;
+      outline-offset: 2px;
+    }
+  }
+}
+
+.entrada-senha {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mostrar-senha {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  color: #18304b;
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #266bb1;
+  outline-offset: 2px;
+}
+
+.requisitos {
+  display: grid;
+  gap: 5px;
+  margin: 10px 0 0;
+  padding: 0;
+  color: #66758a;
+  font-size: 0.82em;
+  list-style: none;
+
+  li::before {
+    display: inline-block;
+    width: 1.25em;
+    content: "○";
+  }
+
+  li.atendido {
+    color: #237044;
+
+    &::before {
+      content: "✓";
+    }
+  }
+}
+
+.entrar,
+.cancelar {
+  min-height: 48px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 1em;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.entrar {
+  border: 0;
+  color: #171717;
+  background: #d2b35f;
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+}
+
+.cancelar {
+  border: 1px solid #aab4c1;
+  color: #18304b;
+  background: #fff;
+}
+
+.mensagem {
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid #c9a5a5;
+  border-radius: 6px;
+  color: #792d2d;
+  background: #fff5f5;
+  font-size: 0.9em;
+}
+
+.campo p.erro {
+  margin: 8px 0 0;
+  color: #a32929;
+  font-size: 0.875em;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.rodape {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.85em;
+
+  a {
+    color: #806426;
+  }
+}
+
+@media (max-width: 900px) {
+  .formulario {
+    padding: 24px 0;
+  }
+}
+
+/* Mantém o controle ao lado do texto e proporcional à escala da fonte. */
+:host ::ng-deep kc-logout-other-sessions label {
+  display: grid !important;
+  width: 100%;
+  grid-template-columns: 1em minmax(0, 1fr);
+  align-items: start !important;
+  column-gap: 0.6em;
+  line-height: 1.4;
+}
+
+:host ::ng-deep kc-logout-other-sessions input[type='checkbox'],
+:host ::ng-deep kc-logout-other-sessions input[type='radio'] {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  inline-size: 1em;
+  block-size: 1em;
+  margin: 0.2em 0 0 !important;
+  font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

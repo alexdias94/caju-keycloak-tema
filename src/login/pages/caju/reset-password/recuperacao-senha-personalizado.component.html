@@ -1,0 +1,74 @@
+<app-layout-autenticacao>
+  <div class="formulario">
+    <h1>{{ i18n.msgStr('emailForgotTitle') }}</h1>
+
+    <p id="instrucao-recuperacao" class="apoio">
+      @if (kcContext.realm?.duplicateEmailsAllowed) {
+        {{ i18n.msgStr('emailInstructionUsername') }}
+      } @else {
+        {{ i18n.msgStr('emailInstruction') }}
+      }
+    </p>
+
+    @if (kcContext.message) {
+      <div class="mensagem" role="status">
+        {{ kcContext.message.summary }}
+      </div>
+    }
+
+    <form
+      class="formulario-login"
+      method="post"
+      [attr.action]="kcContext.url?.loginAction"
+      (submit)="envioIniciado.set(true)"
+    >
+      <div class="campo">
+        <label for="username">
+          @if (!kcContext.realm?.loginWithEmailAllowed) {
+            {{ i18n.msgStr('username') }}
+          } @else if (!kcContext.realm?.registrationEmailAsUsername) {
+            {{ i18n.msgStr('usernameOrEmail') }}
+          } @else {
+            {{ i18n.msgStr('email') }}
+          }
+        </label>
+
+        <input
+          id="username"
+          name="username"
+          type="text"
+          autocomplete="username"
+          [value]="kcContext.auth?.attemptedUsername ?? ''"
+          [attr.aria-invalid]="temErroDeIdentificador() ? 'true' : null"
+          [attr.aria-describedby]="
+            temErroDeIdentificador()
+              ? 'erro-identificador'
+              : 'instrucao-recuperacao'
+          "
+          autofocus
+        />
+
+        @if (temErroDeIdentificador()) {
+          <div id="erro-identificador" class="erro" role="alert">
+            {{ kcContext.messagesPerField.get('username') }}
+          </div>
+        }
+      </div>
+
+      <a class="voltar-login" [attr.href]="kcContext.url?.loginUrl">
+        <i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i>
+        {{ i18n.msgStr('backToLogin') }}
+      </a>
+
+      <button class="entrar" type="submit" [disabled]="envioIniciado()">
+        {{ i18n.msgStr('doSubmit') }}
+      </button>
+    </form>
+
+    <p class="rodape">
+      <a href="mailto:caju.biblioteca@stj.jus.br">
+        caju.biblioteca@stj.jus.br
+      </a>
+    </p>
+  </div>
+</app-layout-autenticacao>

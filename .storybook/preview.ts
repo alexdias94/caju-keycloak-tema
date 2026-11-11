@@ -1,3 +1,4 @@
+import '@fortawesome/fontawesome-free/css/all.css';
 import { type Preview } from '@analogjs/storybook-angular';
 
 /** import here your global style if needed

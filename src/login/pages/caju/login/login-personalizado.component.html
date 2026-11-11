@@ -1,0 +1,119 @@
+<app-layout-autenticacao>
+  <div class="formulario">
+    <h1>Entrar</h1>
+      <p class="apoio">Use o e-mail institucional e a senha cadastrados na CAJU.</p>
+
+      @if (kcContext.message) {
+        <div class="mensagem" role="status">
+          {{ kcContext.message.summary }}
+        </div>
+      }
+
+      @if (kcContext.realm?.password) {
+        <form
+          class="formulario-login"
+          method="post"
+          [attr.action]="kcContext.url?.loginAction"
+          (submit)="loginEnviado.set(true)"
+        >
+          @if (!kcContext.usernameHidden) {
+            <div class="campo">
+              <label for="username">
+                @if (!kcContext.realm?.loginWithEmailAllowed) {
+                  {{ i18n.msgStr('username') }}
+                } @else if (!kcContext.realm?.registrationEmailAsUsername) {
+                  {{ i18n.msgStr('usernameOrEmail') }}
+                } @else {
+                  {{ i18n.msgStr('email') }}
+                }
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                [value]="kcContext.login?.username || ''"
+                [attr.autofocus]="''"
+                [attr.aria-invalid]="temErroDeCampo() ? 'true' : null"
+                aria-describedby="erro-login"
+              />
+            </div>
+          }
+
+          <div class="campo">
+            <div class="linha-senha">
+              <label for="password">{{ i18n.msgStr('password') }}</label>
+              @if (kcContext.realm?.resetPasswordAllowed) {
+                <a [attr.href]="kcContext.url?.loginResetCredentialsUrl">
+                  {{ i18n.msgStr('doForgotPassword') }}
+                </a>
+              }
+            </div>
+
+            <div class="entrada-senha" style="position: relative;">
+              <input
+                id="password"
+                name="password"
+                [type]="mostrarSenha() ? 'text' : 'password'"
+                autocomplete="current-password"
+                [attr.aria-invalid]="temErroDeCampo() ? 'true' : null"
+                aria-describedby="erro-login"
+                style="padding-right: 3rem;"
+              />
+              <button
+                type="button"
+                class="mostrar-senha"
+                (click)="mostrarSenha.update((valor) => !valor)"
+                [attr.aria-pressed]="mostrarSenha()"
+                [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+                aria-controls="password"
+                style="position: absolute; top: 50%; right: 0.6rem; display: grid; width: 2.25rem; height: 2.25rem; padding: 0; place-items: center; transform: translateY(-50%); border: 0; background: transparent; cursor: pointer;"
+              >
+                <i
+                  class="fa-solid"
+                  [class.fa-eye]="!mostrarSenha()"
+                  [class.fa-eye-slash]="mostrarSenha()"
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </div>
+          </div>
+
+          @if (temErroDeCampo()) {
+            <div id="erro-login" class="erro" role="alert">
+              {{ kcContext.messagesPerField?.getFirstError('username', 'password') }}
+            </div>
+          }
+
+          @if (kcContext.realm?.rememberMe && !kcContext.usernameHidden) {
+            <label class="lembrar">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                [checked]="!!kcContext.login?.rememberMe"
+              />
+              {{ i18n.msgStr('rememberMe') }}
+            </label>
+          }
+
+          <input
+            type="hidden"
+            name="credentialId"
+            [value]="kcContext.auth?.selectedCredential || ''"
+          />
+
+          <button class="entrar" type="submit" [disabled]="loginEnviado()">
+            {{ i18n.msgStr('doLogIn') }}
+          </button>
+        </form>
+      } @else {
+        <p class="mensagem">
+          O acesso por senha não está habilitado para este fluxo do Keycloak.
+        </p>
+      }
+
+      <p class="rodape">
+        <a href="mailto:caju.biblioteca@stj.jus.br">caju.biblioteca@stj.jus.br</a>
+      </p>
+</div>
+</app-layout-autenticacao>

@@ -1,0 +1,145 @@
+<app-layout-autenticacao>
+  <div class="formulario">
+
+      <h1>{{ i18n.msgStr('updatePasswordTitle') }}</h1>
+      <p class="apoio">
+        Escolha uma nova senha para acessar a CAJU.
+      </p>
+
+      @if (kcContext.message) {
+        <div class="mensagem" role="status">
+          {{ kcContext.message.summary }}
+        </div>
+      }
+
+      <form
+        class="formulario-login"
+        method="post"
+        [attr.action]="kcContext.url?.loginAction"
+        (submit)="aoEnviar($event)"
+      >
+        <div class="campo">
+          <label for="password-new">{{ i18n.msgStr('passwordNew') }}</label>
+          <div class="entrada-senha">
+            <input
+              id="password-new"
+              name="password-new"
+              [type]="mostrarSenha() ? 'text' : 'password'"
+              autocomplete="new-password"
+              autofocus
+              [attr.aria-invalid]="temErroSenha() ? 'true' : null"
+              aria-describedby="requisitos-senha erro-senha"
+              (input)="atualizarSenha($event)"
+            />
+            <button
+              class="mostrar-senha"
+              type="button"
+              (click)="mostrarSenha.update((valor) => !valor)"
+              [attr.aria-pressed]="mostrarSenha()"
+              [attr.aria-label]="mostrarSenha() ? 'Ocultar senha' : 'Mostrar senha'"
+              aria-controls="password-new"
+            >
+              <i
+                class="fa-solid"
+                [class.fa-eye]="!mostrarSenha()"
+                [class.fa-eye-slash]="mostrarSenha()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+
+          <ul id="requisitos-senha" class="requisitos" aria-live="polite">
+            <li [class.atendido]="senhaTemOitoCaracteres()">
+              No mínimo 8 caracteres
+            </li>
+            <li [class.atendido]="senhaTemNumero()">Pelo menos um número</li>
+            <li [class.atendido]="senhaTemMaiuscula()">
+              Pelo menos uma letra maiúscula
+            </li>
+            <li [class.atendido]="senhaTemMinuscula()">
+              Pelo menos uma letra minúscula
+            </li>
+            <li [class.atendido]="senhaTemEspecial()">
+              Pelo menos um caractere especial
+            </li>
+          </ul>
+
+          @if (erroRequisitos()) {
+            <p class="erro" role="alert">
+              A senha não atende a todos os requisitos. Confira os itens indicados e tente novamente.
+            </p>
+          }
+
+          @if (temErroSenha()) {
+            <p id="erro-senha" class="erro" role="alert">
+              {{ kcContext.messagesPerField.get('password') }}
+            </p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="password-confirm">
+            {{ i18n.msgStr('passwordConfirm') }}
+          </label>
+          <div class="entrada-senha">
+            <input
+              id="password-confirm"
+              name="password-confirm"
+              [type]="mostrarConfirmacao() ? 'text' : 'password'"
+              autocomplete="new-password"
+              [attr.aria-invalid]="temErroConfirmacao() ? 'true' : null"
+              aria-describedby="erro-confirmacao"
+            />
+            <button
+              class="mostrar-senha"
+              type="button"
+              (click)="mostrarConfirmacao.update((valor) => !valor)"
+              [attr.aria-pressed]="mostrarConfirmacao()"
+              [attr.aria-label]="mostrarConfirmacao() ? 'Ocultar senha' : 'Mostrar senha'"
+              aria-controls="password-confirm"
+            >
+              <i
+                class="fa-solid"
+                [class.fa-eye]="!mostrarConfirmacao()"
+                [class.fa-eye-slash]="mostrarConfirmacao()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+
+          @if (temErroConfirmacao()) {
+            <p id="erro-confirmacao" class="erro" role="alert">
+              {{ kcContext.messagesPerField.get('password-confirm') }}
+            </p>
+          }
+        </div>
+
+        <kc-logout-other-sessions />
+
+        <button
+          class="entrar"
+          type="submit"
+          [disabled]="envioIniciado()"
+        >
+          {{ i18n.msgStr('doSubmit') }}
+        </button>
+
+        @if (kcContext.isAppInitiatedAction) {
+          <button
+            class="cancelar"
+            type="submit"
+            name="cancel-aia"
+            value="true"
+          >
+            {{ i18n.msgStr('doCancel') }}
+          </button>
+        }
+      </form>
+
+      <p class="rodape">
+        <a href="mailto:caju.biblioteca@stj.jus.br">
+          caju.biblioteca@stj.jus.br
+        </a>
+      </p>
+  </div>
+</app-layout-autenticacao>

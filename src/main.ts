@@ -1,3 +1,4 @@
+import '@fortawesome/fontawesome-free/css/all.css';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app.config';
 import { bootstrapKcApplication } from './kc.gen';
