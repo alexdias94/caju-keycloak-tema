@@ -89,24 +89,32 @@ a:focus-visible {
 
 .requisitos {
   display: grid;
-  gap: 5px;
+  gap: 8px;
   margin: 10px 0 0;
-  padding: 0;
-  color: #66758a;
-  font-size: 0.82em;
+  padding: 10px 0 0 0;
   list-style: none;
 
-  li::before {
-    display: inline-block;
-    width: 1.25em;
-    content: "○";
-  }
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #66758a;
+    font-size: 0.85em;
+    line-height: 1.4;
 
-  li.atendido {
-    color: #237044;
+    i {
+      width: 1.1em;
+      flex: 0 0 1.1em;
+      margin-top: 0.1em;
+      text-align: center;
+    }
 
-    &::before {
-      content: "✓";
+    &.atendido {
+      color: #237044;
+
+      i {
+        color: #237044;
+      }
     }
   }
 }
