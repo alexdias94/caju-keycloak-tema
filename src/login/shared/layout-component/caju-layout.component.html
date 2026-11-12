@@ -4,19 +4,23 @@
   [style.--escala]="escalaFonte()"
 >
   <section class="lado-marca" aria-label="Enfam — CAJU Biblioteca">
-    <app-cena-ascii-login [centralizada]="true"></app-cena-ascii-login>
+    <app-cena-ascii-login [centralizada]="true" caju="lente"></app-cena-ascii-login>
 
     <div class="marca-conteudo">
-      <img
-        src="/marca/enfam-vertical-branca-120.webp"
-        srcset="
-          /marca/enfam-vertical-branca-120.webp 1x,
-          /marca/enfam-vertical-branca-240.webp 2x
-        "
-        alt="Enfam — Escola Nacional de Formação e Aperfeiçoamento de Magistrados"
-        width="120"
-        height="124"
-      />
+      <picture>
+        <source
+          media="(max-width: 700px)"
+          [srcset]="logoMobileSrcset"
+        />
+
+        <img
+          [src]="logoEnfamSrc"
+          [srcset]="logoEnfamSrcset"
+          alt="Enfam — Escola Nacional de Formação e Aperfeiçoamento de Magistrados"
+          width="120"
+          height="124"
+        />
+      </picture>
 
       <div>
         <p class="servico">

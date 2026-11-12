@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  input, 
   signal,
 } from '@angular/core';
 import { KC_LOGIN_CONTEXT } from '@keycloakify/angular/login/tokens/kc-context';
@@ -71,23 +72,23 @@ function carregarScriptVlibras(): Promise<void> {
 export class CajuLayoutComponent {
   private readonly kcContext = inject<KcContext>(KC_LOGIN_CONTEXT);
 
-  protected readonly logoEnfamSrc = this.urlRecursoTema(
-    'marca/enfam-vertical-branca-120.webp',
-  );
+  protected readonly logoEnfamSrc =
+  `${import.meta.env.BASE_URL}marca/enfam-vertical-branca-120.webp`;
 
-  protected readonly logoEnfamSrcset = [
-    `${this.urlRecursoTema('marca/enfam-vertical-branca-120.webp')} 1x`,
-    `${this.urlRecursoTema('marca/enfam-vertical-branca-240.webp')} 2x`,
-  ].join(', ');
+protected readonly logoEnfamSrcset = [
+  `${import.meta.env.BASE_URL}marca/enfam-vertical-branca-120.webp 1x`,
+  `${import.meta.env.BASE_URL}marca/enfam-vertical-branca-240.webp 2x`,
+].join(', ');
 
   protected readonly logoMobileSrc = this.urlRecursoTema(
-    'marca/enfam-horizontal-174.webp',
+    `${import.meta.env.BASE_URL}marca/enfam-horizontal-174.webp`,
   );
 
   protected readonly logoMobileSrcset = [
     `${this.urlRecursoTema('marca/enfam-horizontal-174.webp')} 1x`,
     `${this.urlRecursoTema('marca/enfam-horizontal-348.webp')} 2x`,
   ].join(', ');
+
 
   protected readonly altoContraste = signal(false);
   protected readonly escalaFonte = signal(1);

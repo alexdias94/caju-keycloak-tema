@@ -9,7 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MotorAscii, type Tela } from './cena-ascii.motor';
+import { MotorAscii, type PosicaoCaju, type Tela } from './cena-ascii.motor';
 
 @Component({
   selector: 'app-cena-ascii-login',
@@ -81,6 +81,7 @@ import { MotorAscii, type Tela } from './cena-ascii.motor';
 })
 export class CenaAsciiLoginComponent {
   readonly centralizada = input(true);
+  readonly caju = input<PosicaoCaju>('haste');
 
   protected readonly movimentoReduzido = signal(false);
   protected readonly pausada = signal(false);
@@ -158,6 +159,7 @@ export class CenaAsciiLoginComponent {
       {
         centralizada: this.centralizada(),
         movimentoReduzido: this.movimentoReduzido(),
+        caju: this.caju(),
       },
     );
 

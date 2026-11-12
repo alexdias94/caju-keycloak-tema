@@ -19,10 +19,14 @@
 export type Tela = OffscreenCanvas;
 type Contexto = OffscreenCanvasRenderingContext2D;
 
+/** Onde aparece o nome CAJU: gravado no cabo da lupa ou destacado no texto da lente. */
+export type PosicaoCaju = 'haste' | 'lente';
+
 export interface OpcoesCena {
   /** true: lupa no centro; false: à direita no desktop, deixando o texto do banner livre. */
   centralizada: boolean;
   movimentoReduzido: boolean;
+  caju: PosicaoCaju;
 }
 
 // Texto lido pela lente: art. 5º da Constituição Federal (domínio público)
@@ -37,7 +41,12 @@ const TEXTO =
 const RAMPA = ' .:;i1tfLCG08@';
 // Fora da lente: caracteres sem ordem
 const CAOS = '0123456789§¶{}[]<>/\\|+=*#%&$~^ΣΔΩπλ∂∫≈≠abcdefghijklmnopqrstuvwxyzXYZ';
-const CARACTERES = [...new Set([...TEXTO, ...RAMPA, ...CAOS])];
+const NOME = 'CAJU';
+// Opção "lente": o nome entra no texto em três pontos, como palavra em negrito
+const TEXTO_COM_NOME = TEXTO.replace('Art. 5º', `${NOME} · Art. 5º`)
+  .replace('obrigações;', `obrigações; ${NOME} ·`)
+  .replace('a direito;', `a direito; ${NOME} ·`);
+const CARACTERES = [...new Set([...TEXTO_COM_NOME, ...NOME, ...RAMPA, ...CAOS])];
 const INDICE = new Map(CARACTERES.map((c, i) => [c, i]));
 // Palavras em negrito dentro da lente: marca, no texto, as posições que pertencem a elas
 const DESTAQUES = new Set([
@@ -56,10 +65,14 @@ const DESTAQUES = new Set([
   'processo',
   'celeridade',
   'inviolabilidade',
+  'caju',
 ]);
-const EM_NEGRITO = new Uint8Array(TEXTO.length);
-for (const m of TEXTO.matchAll(/\p{L}+/gu)) {
-  if (DESTAQUES.has(m[0].toLowerCase())) EM_NEGRITO.fill(1, m.index!, m.index! + m[0].length);
+function marcarNegrito(texto: string): Uint8Array {
+  const marcas = new Uint8Array(texto.length);
+  for (const m of texto.matchAll(/\p{L}+/gu)) {
+    if (DESTAQUES.has(m[0].toLowerCase())) marcas.fill(1, m.index!, m.index! + m[0].length);
+  }
+  return marcas;
 }
 
 // Paletas (escuro → claro): texto do fundo, texto visto pela lente, metal dourado e negrito
@@ -69,8 +82,11 @@ const PALETAS = [
   ['#5b6f8f', '#8ea2c1', '#c4d1e4', '#eef3fb', '#ffffff'],
   ['#3b311a', '#6e5d2e', '#a88f4c', '#cfb163', '#f1e3b8', '#fffaf0'],
   ['#6e5d2e', '#a88f4c', '#cfb163', '#e6cb7e', '#f6e7bd'],
+  // letras gravadas no cabo: claras, para se destacarem do metal dourado
+  ['#e9dcb4', '#fff6dc', '#ffffff'],
 ];
 const NEGRITO = 3;
+const GRAVADO = 4;
 const FAMILIA = 'ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace';
 
 function interpolar(cores: string[], t: number): string {
@@ -109,6 +125,9 @@ export class MotorAscii {
 
   private tempo = 0;
   private formacao: number;
+  // texto da lente e palavras em negrito, conforme a posição escolhida para o nome CAJU
+  private readonly texto: string;
+  private readonly emNegrito: Uint8Array;
   private luzX = -0.55;
   private luzY = -0.65;
   private alvoLuzX = -0.55;
@@ -119,6 +138,8 @@ export class MotorAscii {
     private readonly criarTela: (largura: number, altura: number) => Tela,
     private readonly opcoes: OpcoesCena,
   ) {
+    this.texto = opcoes.caju === 'lente' ? TEXTO_COM_NOME : TEXTO;
+    this.emNegrito = marcarNegrito(this.texto);
     const ctx = tela.getContext('2d') as Contexto | null;
     if (!ctx) throw new Error('Canvas 2D indisponível');
     this.ctx = ctx;
@@ -139,7 +160,7 @@ export class MotorAscii {
     ac.scale(this.dpr, this.dpr);
     ac.textBaseline = 'middle';
     PALETAS.forEach((cores, pi) => {
-      ac.font = pi === NEGRITO ? `700 ${fonte}` : fonte;
+      ac.font = pi === NEGRITO || pi === GRAVADO ? `700 ${fonte}` : fonte;
       for (let n = 0; n < NIVEIS; n++) {
         ac.fillStyle = interpolar(cores, n / (NIVEIS - 1));
         const y = (pi * NIVEIS + n) * this.ch + this.ch / 2;
@@ -233,7 +254,18 @@ export class MotorAscii {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    const nTexto = TEXTO.length;
+    const texto = this.texto;
+    const emNegrito = this.emNegrito;
+    const nTexto = texto.length;
+    // Opção "haste": CAJU gravado na horizontal, numa linha da grade que cruza o cabo, com uma
+    // célula vazia de cada lado (como uma plaqueta). O cabo é largo o bastante para as 4 letras.
+    let linhaNome = -1;
+    let colNome = -1;
+    if (this.opcoes.caju === 'haste') {
+      const ao = 0.4;
+      linhaNome = Math.floor((ay + dhy * ao * Lc) / ch);
+      colNome = Math.round((ax + dhx * ao * Lc) / cw - NOME.length / 2);
+    }
     // o texto de fundo rola para cima, uma linha a cada 0,9 s
     const rolagem = Math.floor(tempo / 0.9);
     const nCaos = CAOS.length;
@@ -288,11 +320,21 @@ export class MotorAscii {
           paleta = 2;
           nivel = lum;
           caractere = RAMPA[Math.min(RAMPA.length - 1, 2 + Math.floor(lum * (RAMPA.length - 2)))];
+          if (row === linhaNome) {
+            const letra = col - colNome;
+            if (letra >= 0 && letra < NOME.length) {
+              caractere = NOME[letra];
+              paleta = GRAVADO;
+              nivel = 0.7 + 0.3 * lum;
+            } else if (letra === -1 || letra === NOME.length) {
+              caractere = ' ';
+            }
+          }
         } else if (d < R - W) {
           // ---- lente: na mesma grade do fundo, o texto aparece legível
           const q = d / (R - W);
           const pos = ((((row + rolagem) * cols + col) % nTexto) + nTexto) % nTexto;
-          caractere = TEXTO[pos];
+          caractere = texto[pos];
           // superfície abaulada: reflexo especular e borda mais clara (Fresnel)
           const qx = (dx / (R - W)) * 0.75;
           const qy = (dy / (R - W)) * 0.75;
@@ -300,8 +342,8 @@ export class MotorAscii {
           const esp = Math.pow(Math.max(0, qx * Hx + qy * Hy + nz * Hz), 70);
           const borda = suave(0.72, 1, q) * 0.35;
           const lum = 0.32 + 0.25 * (1 - q) + borda;
-          paleta = EM_NEGRITO[pos] ? NEGRITO : 1;
-          nivel = EM_NEGRITO[pos] ? 0.55 + lum * 0.5 : lum;
+          paleta = emNegrito[pos] ? NEGRITO : 1;
+          nivel = emNegrito[pos] ? 0.55 + lum * 0.5 : lum;
           if (esp > 0.35) {
             caractere = RAMPA[Math.min(RAMPA.length - 1, 6 + Math.floor(esp * 8))];
             nivel = 1;
