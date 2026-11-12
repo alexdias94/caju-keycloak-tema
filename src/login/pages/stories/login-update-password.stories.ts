@@ -4,7 +4,7 @@ import { decorators, KcPageStory } from '../../KcPageStory';
 const meta: Meta<KcPageStory> = {
   title: 'login/login-update-password.ftl',
   component: KcPageStory,
-  decorators: decorators,
+  decorators,
   globals: {
     pageId: 'login-update-password.ftl',
   },
@@ -13,12 +13,30 @@ const meta: Meta<KcPageStory> = {
 export default meta;
 type Story = StoryObj<KcPageStory>;
 
-export const Default: Story = {};
+const contextoBase = {
+  url: {
+    loginAction: '/mock-login-action',
+  },
+  isAppInitiatedAction: false,
+  messagesPerField: {
+    existsError: () => false,
+    get: () => '',
+  },
+};
+
+export const Default: Story = {
+  globals: {
+    kcContext: contextoBase,
+  },
+};
 
 export const PortuguesBr: Story = {
   globals: {
     kcContext: {
-      locale: { currentLanguageTag: 'pt-BR' },
+      ...contextoBase,
+      locale: {
+        currentLanguageTag: 'pt-BR',
+      },
     },
   },
 };
@@ -26,14 +44,12 @@ export const PortuguesBr: Story = {
 export const WithPasswordError: Story = {
   globals: {
     kcContext: {
-      url: {
-        loginAction: '/mock-login-action',
-      },
+      ...contextoBase,
       messagesPerField: {
         existsError: (field: string) => field === 'password',
-        get: () => 'Password must be at least 8 characters long.',
-      },
-      isAppInitiatedAction: false,
+        get: (field: string) =>
+          field === 'password' ? 'A senha não atende aos requisitos.' : '',
+      }
     },
   },
 };
@@ -41,14 +57,50 @@ export const WithPasswordError: Story = {
 export const WithPasswordConfirmError: Story = {
   globals: {
     kcContext: {
-      url: {
-        loginAction: '/mock-login-action',
-      },
+      ...contextoBase,
       messagesPerField: {
         existsError: (field: string) => field === 'password-confirm',
-        get: () => 'Passwords do not match.',
+        get: (field: string) =>
+          field === 'password-confirm' ? 'As senhas não coincidem.' : '',
       },
-      isAppInitiatedAction: false,
+    },
+  },
+};
+
+export const WithAllPasswordErrors: Story = {
+  globals: {
+    kcContext: {
+      ...contextoBase,
+      message: {
+        type: 'error',
+        summary: 'Não foi possível atualizar a senha.',
+      },
+      messagesPerField: {
+        existsError: (field: string) =>
+          field === 'password' || field === 'password-confirm',
+        get: (field: string) => {
+          if (field === 'password') {
+            return 'A senha não atende aos requisitos.';
+          }
+
+          if (field === 'password-confirm') {
+            return 'As senhas não coincidem.';
+          }
+
+          return '';
+        },
+      },
+    },
+  },
+};
+
+export const WithServerMessage: Story = {
+  globals: {
+    kcContext: {
+      message: {
+        type: 'error',
+        summary: 'As senhas não coincidem.',
+      },
     },
   },
 };

@@ -65,6 +65,8 @@
   margin: 0;
   font-size: calc(1.5rem * var(--escala-texto, 1));
   font-weight: 700;
+  color: #fff !important;
+
 
   span {
     color: #d2b35f;
@@ -74,6 +76,7 @@
 .descricao {
   margin: 5px 0 0;
   font-size: calc(0.9rem * var(--escala-texto, 1));
+  color: #fff !important;
 }
 
 .lado-form {

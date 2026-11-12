@@ -148,6 +148,25 @@ a:focus-visible {
   font-size: 0.9em;
 }
 
+.toast-erros {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #c9a5a5;
+  border-radius: 8px;
+  color: #792d2d;
+  background: #fff1f1;
+  font-size: 0.9em;
+  line-height: 1.45;
+}
+
+.toast-erros p {
+  margin: 0;
+}
+
+.toast-erros p + p {
+  margin-top: 6px;
+}
+
 .campo p.erro {
   margin: 8px 0 0;
   color: #a32929;

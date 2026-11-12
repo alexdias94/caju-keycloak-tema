@@ -1,8 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   signal,
 } from '@angular/core';
+import { KC_LOGIN_CONTEXT } from '@keycloakify/angular/login/tokens/kc-context';
+import type { KcContext } from 'keycloakify/login/KcContext';
 import { CenaAsciiLoginComponent } from '../cena-ascii-login.component';
 
 declare global {
@@ -16,13 +19,32 @@ declare global {
 let vlibrasScriptPromise: Promise<void> | undefined;
 
 function carregarScriptVlibras(): Promise<void> {
-  if (window.VLibras) return Promise.resolve();
-  if (vlibrasScriptPromise) return vlibrasScriptPromise;
+  if (window.VLibras) {
+    return Promise.resolve();
+  }
 
-  vlibrasScriptPromise = new Promise((resolve, reject) => {
+  if (vlibrasScriptPromise) {
+    return vlibrasScriptPromise;
+  }
+
+  vlibrasScriptPromise = new Promise<void>((resolve, reject) => {
     let script = document.getElementById(
       'vlibras-plugin-script',
     ) as HTMLScriptElement | null;
+
+    const aoCarregar = (): void => {
+      if (window.VLibras) {
+        resolve();
+      } else {
+        vlibrasScriptPromise = undefined;
+        reject(new Error('O script do VLibras carregou, mas não inicializou.'));
+      }
+    };
+
+    const aoFalhar = (): void => {
+      vlibrasScriptPromise = undefined;
+      reject(new Error('Não foi possível carregar o VLibras.'));
+    };
 
     if (!script) {
       script = document.createElement('script');
@@ -32,12 +54,8 @@ function carregarScriptVlibras(): Promise<void> {
       document.head.appendChild(script);
     }
 
-    script.addEventListener('load', () => resolve(), { once: true });
-    script.addEventListener(
-      'error',
-      () => reject(new Error('Não foi possível carregar o VLibras.')),
-      { once: true },
-    );
+    script.addEventListener('load', aoCarregar, { once: true });
+    script.addEventListener('error', aoFalhar, { once: true });
   });
 
   return vlibrasScriptPromise;
@@ -51,13 +69,52 @@ function carregarScriptVlibras(): Promise<void> {
   styleUrl: './caju-layout.component.scss',
 })
 export class CajuLayoutComponent {
+  private readonly kcContext = inject<KcContext>(KC_LOGIN_CONTEXT);
+
+  protected readonly logoEnfamSrc = this.urlRecursoTema(
+    'marca/enfam-vertical-branca-120.webp',
+  );
+
+  protected readonly logoEnfamSrcset = [
+    `${this.urlRecursoTema('marca/enfam-vertical-branca-120.webp')} 1x`,
+    `${this.urlRecursoTema('marca/enfam-vertical-branca-240.webp')} 2x`,
+  ].join(', ');
+
+  protected readonly logoMobileSrc = this.urlRecursoTema(
+    'marca/enfam-horizontal-174.webp',
+  );
+
+  protected readonly logoMobileSrcset = [
+    `${this.urlRecursoTema('marca/enfam-horizontal-174.webp')} 1x`,
+    `${this.urlRecursoTema('marca/enfam-horizontal-348.webp')} 2x`,
+  ].join(', ');
+
   protected readonly altoContraste = signal(false);
   protected readonly escalaFonte = signal(1);
   protected readonly vlibrasCarregando = signal(false);
+
   private vlibrasWidgetInicializado = false;
 
+  private urlRecursoTema(caminho: string): string {
+    const resourcesPath = this.kcContext.url?.resourcesPath?.replace(/\/+$/, '');
+    const caminhoRelativo = caminho.replace(/^\/+/, '');
+
+    if (!resourcesPath) {
+      console.error(
+        'kcContext.url.resourcesPath não está disponível; não foi possível montar a URL do recurso:',
+        caminhoRelativo,
+      );
+
+      return '';
+    }
+
+    return `${resourcesPath}/${caminhoRelativo}`;
+  }
+
   protected ativarVlibras(): void {
-    if (this.vlibrasCarregando()) return;
+    if (this.vlibrasCarregando()) {
+      return;
+    }
 
     if (this.vlibrasWidgetInicializado) {
       this.acionarBotaoVlibras();
@@ -79,7 +136,9 @@ export class CajuLayoutComponent {
       .catch((erro: unknown) => {
         console.error('Falha ao iniciar o VLibras:', erro);
       })
-      .finally(() => this.vlibrasCarregando.set(false));
+      .finally(() => {
+        this.vlibrasCarregando.set(false);
+      });
   }
 
   private acionarBotaoVlibras(tentativas = 30): void {
@@ -91,7 +150,10 @@ export class CajuLayoutComponent {
     }
 
     if (tentativas > 0) {
-      window.setTimeout(() => this.acionarBotaoVlibras(tentativas - 1), 100);
+      window.setTimeout(
+        () => this.acionarBotaoVlibras(tentativas - 1),
+        100,
+      );
     }
   }
 
@@ -99,7 +161,7 @@ export class CajuLayoutComponent {
     this.altoContraste.update((valor) => !valor);
   }
 
-   protected aumentarFonte(): void {
+  protected aumentarFonte(): void {
     this.escalaFonte.update((valor) => Math.min(1.375, valor + 0.125));
   }
 
@@ -107,4 +169,3 @@ export class CajuLayoutComponent {
     this.escalaFonte.update((valor) => Math.max(0.875, valor - 0.125));
   }
 }
-
