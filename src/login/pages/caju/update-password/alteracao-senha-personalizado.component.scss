@@ -229,3 +229,19 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+:host ::ng-deep .tela-autenticacao.alto-contraste .requisitos li {
+  color: #fff; // não atendido
+
+  i {
+    color: #fff;
+  }
+
+  &.atendido {
+    color: #ffd700; // atendido
+
+    i {
+      color: #ffd700;
+    }
+  }
+}
