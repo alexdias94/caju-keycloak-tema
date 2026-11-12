@@ -1,75 +1,46 @@
-<main
-  class="tela-autenticacao"
-  [class.alto-contraste]="altoContraste()"
-  [style.--escala]="escalaFonte()"
->
+<main class="tela-autenticacao" [class.alto-contraste]="altoContraste()" [style.--escala]="escalaFonte()">
   <section class="lado-marca" aria-label="Enfam — CAJU Biblioteca">
+    @defer (on idle) {
     <app-cena-ascii-login [centralizada]="true" caju="lente"></app-cena-ascii-login>
+    }
+
+    <app-logos-orgaos class="orgaos" [reduzido]="true"></app-logos-orgaos>
 
     <div class="marca-conteudo">
-      <picture>
-        <source
-          media="(max-width: 700px)"
-          [srcset]="logoMobileSrcset"
-        />
+      <img
+        class="marca-caju"
+        [src]="urlPublica('marca/caju-branca.svg')"
+        alt="CAJU – Central de Atendimento ao Juiz Federal"
+        width="171"
+        height="63"
+      />
 
-        <img
-          [src]="logoEnfamSrc"
-          [srcset]="logoEnfamSrcset"
-          alt="Enfam — Escola Nacional de Formação e Aperfeiçoamento de Magistrados"
-          width="120"
-          height="124"
-        />
-      </picture>
-
-      <div>
-        <p class="servico">
-          CAJU <span>· Biblioteca</span>
-        </p>
-        <p class="descricao">
-          Central de Atendimento aos Juízes Federais e Estaduais
-        </p>
-      </div>
+      <p class="sr-only">
+        CAJU · Biblioteca jurídica. Central de Atendimento aos Juízes Federais e Estaduais,
+        mantida pelo STJ, pela Enfam e pelo CJF.
+      </p>
     </div>
   </section>
 
   <section class="lado-form" aria-label="Conteúdo da autenticação">
     <nav class="controles-a11y" aria-label="Acessibilidade">
-      <button
-        type="button"
-        [attr.aria-pressed]="altoContraste()"
-        (click)="alternarAltoContraste()"
-      >
-      <i class="fa-solid fa-circle-half-stroke"></i>
+      <button type="button" [attr.aria-pressed]="altoContraste()" (click)="alternarAltoContraste()">
+        <i class="fa-solid fa-circle-half-stroke"></i>
         Alto contraste
       </button>
 
-      <button
-        type="button"
-        class="botao-vlibras"
-        aria-label="Ativar tradutor em Libras (VLibras)"
-        [attr.aria-busy]="vlibrasCarregando()"
-        [disabled]="vlibrasCarregando()"
-        (click)="ativarVlibras()"
-      >
-      <i class="fa-regular fa-hand"></i>
+      <button type="button" class="botao-vlibras" aria-label="Ativar tradutor em Libras (VLibras)"
+        [attr.aria-busy]="vlibrasCarregando()" [disabled]="vlibrasCarregando()" (click)="ativarVlibras()">
+        <i class="fa-regular fa-hand"></i>
         {{ vlibrasCarregando() ? 'Carregando VLibras…' : 'VLibras' }}
       </button>
 
-      <button
-        type="button"
-        aria-label="Aumentar texto"
-        (click)="aumentarFonte()"
-      >
+      <button type="button" aria-label="Aumentar texto" (click)="aumentarFonte()">
         A
         <i class="fa-solid fa-plus"></i>
       </button>
 
-      <button
-        type="button"
-        aria-label="Diminuir texto"
-        (click)="diminuirFonte()"
-      >
+      <button type="button" aria-label="Diminuir texto" (click)="diminuirFonte()">
         A
         <i class="fa-solid fa-minus"></i>
       </button>

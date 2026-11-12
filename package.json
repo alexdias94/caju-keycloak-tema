@@ -1,6 +1,6 @@
 {
   "name": "caju-theme",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "Angular + Vite Starter for Keycloakify 11",
   "repository": {

@@ -1,13 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
-  input, 
+  input,
   signal,
 } from '@angular/core';
-import { KC_LOGIN_CONTEXT } from '@keycloakify/angular/login/tokens/kc-context';
-import type { KcContext } from 'keycloakify/login/KcContext';
 import { CenaAsciiLoginComponent } from '../cena-ascii-login.component';
+import { LogosOrgaos } from './logos-orgaos';
 
 declare global {
   interface Window {
@@ -16,6 +14,8 @@ declare global {
     };
   }
 }
+
+type PosicaoCaju = 'haste' | 'lente';
 
 let vlibrasScriptPromise: Promise<void> | undefined;
 
@@ -64,31 +64,14 @@ function carregarScriptVlibras(): Promise<void> {
 
 @Component({
   selector: 'app-layout-autenticacao',
-  imports: [CenaAsciiLoginComponent],
+  imports: [CenaAsciiLoginComponent, LogosOrgaos],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './caju-layout.component.html',
   styleUrl: './caju-layout.component.scss',
 })
 export class CajuLayoutComponent {
-  private readonly kcContext = inject<KcContext>(KC_LOGIN_CONTEXT);
-
-  protected readonly logoEnfamSrc =
-  `${import.meta.env.BASE_URL}marca/enfam-vertical-branca-120.webp`;
-
-protected readonly logoEnfamSrcset = [
-  `${import.meta.env.BASE_URL}marca/enfam-vertical-branca-120.webp 1x`,
-  `${import.meta.env.BASE_URL}marca/enfam-vertical-branca-240.webp 2x`,
-].join(', ');
-
-  protected readonly logoMobileSrc = this.urlRecursoTema(
-    `${import.meta.env.BASE_URL}marca/enfam-horizontal-174.webp`,
-  );
-
-  protected readonly logoMobileSrcset = [
-    `${this.urlRecursoTema('marca/enfam-horizontal-174.webp')} 1x`,
-    `${this.urlRecursoTema('marca/enfam-horizontal-348.webp')} 2x`,
-  ].join(', ');
-
+  /** Define se CAJU aparece gravado na haste ou destacado na lente. */
+  readonly caju = input<PosicaoCaju>('lente');
 
   protected readonly altoContraste = signal(false);
   protected readonly escalaFonte = signal(1);
@@ -96,20 +79,10 @@ protected readonly logoEnfamSrcset = [
 
   private vlibrasWidgetInicializado = false;
 
-  private urlRecursoTema(caminho: string): string {
-    const resourcesPath = this.kcContext.url?.resourcesPath?.replace(/\/+$/, '');
-    const caminhoRelativo = caminho.replace(/^\/+/, '');
-
-    if (!resourcesPath) {
-      console.error(
-        'kcContext.url.resourcesPath não está disponível; não foi possível montar a URL do recurso:',
-        caminhoRelativo,
-      );
-
-      return '';
-    }
-
-    return `${resourcesPath}/${caminhoRelativo}`;
+  /** Monta a URL de um arquivo de public/ respeitando a base configurada pelo Vite. */
+  protected urlPublica(caminho: string): string {
+    const base = import.meta.env.BASE_URL;
+    return `${base}${caminho.replace(/^\/+/, '')}`;
   }
 
   protected ativarVlibras(): void {
