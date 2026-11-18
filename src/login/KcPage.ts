@@ -9,7 +9,7 @@ export const doUseDefaultCss = true;
 export const doMakeUserConfirmPassword = true;
 
 export async function getKcPage(pageId: KcContext['pageId']): Promise<KcPage> {
- const PageComponent = await (async () => {
+  const PageComponent = await (async () => {
     switch (pageId) {
       case 'login.ftl':
         return (
@@ -30,12 +30,12 @@ export async function getKcPage(pageId: KcContext['pageId']): Promise<KcPage> {
           )
         ).AlteracaoSenhaComponent;
 
-       case 'email-otp-code.ftl':
+      case 'email-otp-code.ftl':
         return (
           await import(
             './pages/caju/email-otp-code/email-otp-code-personalizado.component'
           )
-        ).EmailOtpCodeComponent;  
+        ).EmailOtpCodeComponent;
 
       default:
         return getDefaultPageComponent(pageId);

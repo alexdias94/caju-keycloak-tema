@@ -7,32 +7,27 @@ export type KcContextExtension = {
 };
 
 export type KcContextExtensionPerPage = {
-  // Here you can declare additional properties on the KcContext
-  // See: https://docs.keycloakify.dev/faq-and-help/some-values-you-need-are-missing-from-in-kccontext
-};
-
-type EmailOtpKcContext = {
-  pageId: 'email-otp-code.ftl';
-  url: {
-    loginAction: string;
-    loginUrl?: string;
-  };
-  message?: {
-    type?: string;
-    summary?: string;
-  };
-  messagesPerField: {
-    existsError: (field: string) => boolean;
-    get: (field: string) => string;
-  };
-  locale?: {
-    currentLanguageTag: string;
+  'email-otp-code.ftl': {
+    url: {
+      loginAction: string;
+      loginUrl?: string;
+    };
+    execution?: string;
+    message?: {
+      type?: string;
+      summary?: string;
+    };
+    messagesPerField: {
+      existsError: (field: string) => boolean;
+      get: (field: string) => string;
+    };
+    locale?: {
+      currentLanguageTag: string;
+    };
   };
 };
 
-type DefaultKcContext = ExtendKcContext<
+export type KcContext = ExtendKcContext<
   KcContextExtension,
   KcContextExtensionPerPage
 >;
-
-export type KcContext = DefaultKcContext | EmailOtpKcContext;
